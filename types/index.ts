@@ -10,6 +10,7 @@ export interface Surah {
 
 export interface Ayah {
  number: number;
+ numberInSurah: number;
  text: string;
  translation?: string;
  audio?: string;
@@ -29,25 +30,12 @@ export interface BookmarkData {
 
 // Tajwid Rules Type
 export interface TajwidRule {
+ id: string;
  name: string;
  description: string;
- example: string;
+ colors: string[];
+ examples: string[];
 }
-
-export const tajwidRules: TajwidRule[] = [
- {
-  name: 'Noon Sakinah',
-  description: 'Rules for pronouncing noon with a sukoon',
-  example: 'مِن بَعْدِ'
- },
- {
-  name: 'Meem Sakinah',
-  description: 'Rules for pronouncing meem with a sukoon',
-  example: 'هُم بَعْضٌ'
- },
- // Add more tajwid rules
-];
-
 
 export interface Edition {
  identifier: string;
@@ -75,3 +63,4 @@ export interface AyahDetails {
  hizbQuarter: number;
  sajda: boolean;
 }
+

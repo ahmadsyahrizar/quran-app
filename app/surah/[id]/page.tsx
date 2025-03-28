@@ -9,7 +9,9 @@ import { PracticeSession } from '@/components/practiceMode/practiceSession';
 import { useBookmarks } from '@/hooks/useBookmark';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useSurahById } from '@/hooks/useQuranApp';
-import { Bookmark } from 'lucide-react';
+import { Bookmark, TextSelect } from 'lucide-react';
+import { TajweedToggle, TajwidRenderer } from '@/components/tajweed/tajweedRender';
+import TajweedReference from '@/components/tajweedReference';
 
 export default function SurahDetailPage() {
  const { id } = useParams()
@@ -18,6 +20,7 @@ export default function SurahDetailPage() {
  const { data: surahData, isLoading } = useSurahById(surahId);
  const { bookmarks, addBookmark, removeBookmark } = useBookmarks();
  const [selectedAyah, setSelectedAyah] = useState<number | null>(null);
+ const [isTajweedEnabled, setIsTajweedEnabled] = useState(true);
 
  // Memoize bookmarked ayahs for this specific surah
  const bookmarkedAyahs = useMemo(() => {
@@ -52,6 +55,11 @@ export default function SurahDetailPage() {
      <h1 className="text-3xl font-bold">
       {surahData.surah.englishName} ({surahData.surah.name})
      </h1>
+
+     <TajweedToggle
+      enabled={isTajweedEnabled}
+      onToggle={setIsTajweedEnabled}
+     />
      <BookmarkManager
       currentSurah={surahId}
       currentAyah={selectedAyah || 1}
@@ -65,7 +73,12 @@ export default function SurahDetailPage() {
      <Card>
       <CardHeader>
        <CardTitle>Ayahs</CardTitle>
+       <div className="flex items-center space-x-2 text-sm text-muted-foreground">
+        <TextSelect className="h-4 w-4" />
+        <span>Hover for Tajweed details</span>
+       </div>
       </CardHeader>
+
       <CardContent>
        <div className="space-y-4 max-h-[600px] overflow-y-auto">
         {surahData.ayahs.map((ayah) => {
@@ -101,13 +114,12 @@ export default function SurahDetailPage() {
             </div>
            )}
 
-           <p className="arabic-text text-right text-xl">{ayah.text}</p>
-           <p className="text-sm mt-2">{ayah.translation}</p>
-
-           {/* Ayah Number */}
-           <span className="absolute bottom-2 left-2 text-xs text-gray-500">
-            {ayah.number}
-           </span>
+           {/* Tajweed-Aware Text Rendering */}
+           <TajwidRenderer
+            text={ayah.text}
+            enableHighlighting={isTajweedEnabled}
+           />
+           <p className="text-sm mt-2"> {ayah.numberInSurah}. {ayah.translation}</p>
           </div>
          )
         }
@@ -164,6 +176,8 @@ export default function SurahDetailPage() {
       </CardContent>
      </Card>
     )}
+
+    <TajweedReference />
    </div>
   </MainLayout >
  );

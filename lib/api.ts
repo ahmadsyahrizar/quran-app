@@ -29,6 +29,7 @@ export const quranApi = {
    },
    ayahs: surahData.ayahs.map((ayah: Record<string, string>, index: number) => ({
     number: ayah.number,
+    numberInSurah: ayah.numberInSurah,
     text: ayah.text,
     translation: translationData.ayahs[index]?.text || '',
     audio: ayah.audio,
