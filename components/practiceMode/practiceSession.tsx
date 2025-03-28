@@ -29,6 +29,7 @@ export const PracticeSession: React.FC<PracticeSessionProps> = ({
 
  const startListening = useCallback(() => {
   if ('webkitSpeechRecognition' in window) {
+   // @ts-expect-error rija
    const recognition = new window.webkitSpeechRecognition();
    recognition.continuous = false;
    recognition.interimResults = false;
@@ -40,12 +41,14 @@ export const PracticeSession: React.FC<PracticeSessionProps> = ({
     setIsCorrect(null);
    };
 
-   recognition.onresult = (event: any) => {
+   recognition.onresult = (event: {
+    results: [[{ transcript: string }]]
+   }) => {
     const transcript = event.results[0][0].transcript;
     setRecognitionResult(transcript);
 
     // Simple comparison (can be improved with more sophisticated Arabic text matching)
-    const cleanAyahText = data?.text.replace(/[\u0600-\u06FF\s]/g, '');
+    const cleanAyahText = data?.text.replace(/[\u0600-\u06FF\s]/g, '') || "";
     const cleanTranscript = transcript.replace(/[\u0600-\u06FF\s]/g, '');
 
     const similarity = cleanTranscript.length / cleanAyahText?.length;
@@ -61,7 +64,7 @@ export const PracticeSession: React.FC<PracticeSessionProps> = ({
     }
    };
 
-   recognition.onerror = (event: any) => {
+   recognition.onerror = (event: Error) => {
     console.error('Speech recognition error', event);
     setIsListening(false);
    };
@@ -91,7 +94,8 @@ export const PracticeSession: React.FC<PracticeSessionProps> = ({
       variant="destructive"
       onClick={() => {
        // Stop speech recognition if possible
-       (window as any).webkitSpeechRecognition?.stopRecognition?.();
+
+       (window as unknown as { webkitSpeechRecognition?: { stop?: () => void } }).webkitSpeechRecognition?.stop?.();
        setIsListening(false);
       }}
      >
